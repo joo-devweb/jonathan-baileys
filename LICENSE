@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2025 Rajeh Taher/WhiskeySockets
+Copyright (c) 2025 WhatsApp V-Lang Library Contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,3 +19,19 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+DISCLAIMER:
+This project is not affiliated with, associated, authorized, endorsed by, or 
+in any way officially connected with WhatsApp Inc. or any of its subsidiaries 
+or affiliates. The official WhatsApp website can be found at whatsapp.com. 
+"WhatsApp" as well as related names, marks, emblems and images are registered 
+trademarks of their respective owners.
+
+The maintainers of this library do not condone the use of this software in 
+practices that violate WhatsApp's Terms of Service. Users are responsible for 
+ensuring their use of this software complies with all applicable laws and 
+terms of service.
+
+Use at your own discretion and risk. Do not use this software for spam, 
+stalkerware, bulk messaging, or any other activities that violate WhatsApp's 
+Terms of Service or applicable laws.
