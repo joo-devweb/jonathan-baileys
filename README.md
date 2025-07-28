@@ -1,272 +1,504 @@
-# WhatsApp V-Lang Library 📱
+# 📱 WhatsApp V-Lang Library
 
-A comprehensive WhatsApp Web API library for the V programming language, supporting both QR Code and Pairing Code authentication methods.
+**Library WhatsApp Web API untuk V Programming Language** - Implementasi lengkap protokol WhatsApp Web dengan dukungan QR Code dan Pairing Code authentication.
 
-## 🚀 Features
-
-- **Full WhatsApp Web Protocol Implementation**
-  - WebSocket connection with proper headers
-  - Binary node parsing and encoding
-  - AES-256-CBC encryption/decryption
-  - HMAC-SHA256 message authentication
-  - Curve25519 key exchange (ECDH)
-  - HKDF key derivation
-
-- **Authentication Methods**
-  - ✅ QR Code authentication (scan with mobile app)
-  - ✅ Pairing Code authentication (enter code in mobile app)
-  - Session restoration (planned)
-
-- **Message Handling**
-  - Send/receive text messages
-  - Binary message parsing
-  - Message encryption/decryption
-  - Real-time message events
-
-- **Utilities**
-  - Built-in QR code generator
-  - ASCII QR code display
-  - Online QR code URL generation
-  - Comprehensive error handling
-
-## 📦 Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/whatsapp-v-lib.git
-cd whatsapp-v-lib
-
-# Or install as a V module
-v install https://github.com/yourusername/whatsapp-v-lib
-```
-
-## 🔧 Dependencies
-
-This library uses V's built-in modules:
-- `net.websocket` - WebSocket client
-- `crypto.*` - Cryptographic functions
-- `encoding.base64` - Base64 encoding/decoding
-- `json` - JSON parsing
-- `time` - Time utilities
-
-## 📖 Quick Start
-
-### Basic QR Code Authentication
-
-```v
-import whatsapp
-
-fn main() {
-    // Create a new WhatsApp session
-    mut session := whatsapp.new_session()!
-    
-    // Set up QR code handler
-    session.on_qr_code = fn (qr_data string) {
-        println('Scan this QR code with WhatsApp:')
-        qr := whatsapp.generate_qr_code(qr_data)
-        println(qr.to_ascii())
-    }
-    
-    // Set up connection handler
-    session.on_connected = fn () {
-        println('Connected to WhatsApp!')
-    }
-    
-    // Set up message handler
-    session.on_message = fn (node whatsapp.BinaryNode) {
-        if node.tag == 'message' {
-            println('Received message: ${node}')
-        }
-    }
-    
-    // Connect to WhatsApp
-    session.connect()!
-    
-    // Wait for ready state
-    for !session.is_ready() {
-        // Keep running
-    }
-    
-    // Send a message
-    session.send_text_message('1234567890@c.us', 'Hello from V!')!
-}
-```
-
-### Pairing Code Authentication
-
-```v
-import whatsapp
-
-fn main() {
-    mut session := whatsapp.new_session()!
-    
-    // Set up pairing code handler
-    session.on_pairing = fn (code string) {
-        println('Enter this code in WhatsApp: ${code}')
-    }
-    
-    session.connect()!
-    
-    // Request pairing code for your phone number
-    session.request_pairing_code('+1234567890')!
-    
-    // Wait for authentication...
-}
-```
-
-## 📚 API Reference
-
-### Session Management
-
-#### `new_session() !&Session`
-Creates a new WhatsApp session with default configuration.
-
-#### `Session.connect() !`
-Connects to WhatsApp Web servers and initiates the authentication process.
-
-#### `Session.disconnect() !`
-Closes the WebSocket connection and cleans up resources.
-
-#### `Session.is_ready() bool`
-Returns `true` if the session is authenticated and ready to send/receive messages.
-
-### Authentication
-
-#### `Session.request_pairing_code(phone_number string) !`
-Requests a pairing code for the specified phone number.
-
-### Messaging
-
-#### `Session.send_text_message(jid string, text string) !`
-Sends a text message to the specified JID (WhatsApp ID).
-
-#### `Session.send_binary_node(node BinaryNode) !`
-Sends a binary node message (for advanced use cases).
-
-### Event Handlers
-
-Set these function properties on your session to handle events:
-
-```v
-session.on_qr_code = fn (qr_data string) { /* Handle QR code */ }
-session.on_pairing = fn (code string) { /* Handle pairing code */ }
-session.on_connected = fn () { /* Handle successful connection */ }
-session.on_message = fn (node BinaryNode) { /* Handle incoming messages */ }
-session.on_error = fn (err string) { /* Handle errors */ }
-```
-
-### QR Code Utilities
-
-#### `generate_qr_code(data string) QRCode`
-Generates a QR code from the given data.
-
-#### `QRCode.to_ascii() string`
-Converts the QR code to ASCII art for terminal display.
-
-#### `QRCode.save_to_file(filename string) !`
-Saves the QR code as a text file.
-
-#### `create_qr_url(data string, size int) string`
-Creates a URL for online QR code generation.
-
-## 🔒 Security Features
-
-- **End-to-End Encryption**: All messages are encrypted using AES-256-CBC
-- **Message Authentication**: HMAC-SHA256 ensures message integrity
-- **Key Exchange**: Curve25519 ECDH for secure key agreement
-- **Key Derivation**: HKDF for proper key expansion
-- **Session Security**: Secure WebSocket connection with proper headers
-
-## 📱 WhatsApp JID Format
-
-WhatsApp uses JIDs (Jabber IDs) to identify users and groups:
-
-- **Individual chats**: `[country_code][phone_number]@c.us`
-  - Example: `1234567890@c.us`
-- **Group chats**: `[creator_phone]-[timestamp]@g.us`
-  - Example: `1234567890-1609459200@g.us`
-- **Broadcast lists**: `[timestamp]@broadcast`
-  - Example: `1609459200@broadcast`
-
-## 🎯 Examples
-
-Check out the `examples/` directory for complete working examples:
-
-- `basic_example.v` - Basic QR code authentication and messaging
-- `pairing_code_example.v` - Pairing code authentication with interactive chat
-
-## 🛠️ Development
-
-### Building the Library
-
-```bash
-# Compile the library
-v -shared src/
-
-# Run tests
-v test src/
-
-# Run examples
-v run examples/basic_example.v
-v run examples/pairing_code_example.v
-```
-
-### Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## ⚠️ Important Notes
-
-- This library is for educational and research purposes
-- Respect WhatsApp's Terms of Service
-- Use responsibly and don't spam users
-- The library implements the WhatsApp Web protocol, not the mobile API
-- Some features may break if WhatsApp updates their protocol
-
-## 🐛 Known Limitations
-
-- Media messages (images, videos, documents) are not yet implemented
-- Group management features are limited
-- Voice messages are not supported
-- Status updates are not implemented
-- The Curve25519 implementation is simplified (use a proper crypto library in production)
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- WhatsApp Web reverse engineering community
-- [Baileys](https://github.com/WhiskeySockets/Baileys) - JavaScript WhatsApp library
-- [whatsapp-web-reveng](https://github.com/sigalor/whatsapp-web-reveng) - Protocol documentation
-- V language community
-
-## ⚡ Performance
-
-The library is designed to be lightweight and efficient:
-- Minimal memory footprint
-- Fast binary message parsing
-- Efficient WebSocket handling
-- Concurrent message processing
-
-## 🔮 Roadmap
-
-- [ ] Media message support (images, videos, documents)
-- [ ] Voice message support
-- [ ] Group management (create, join, leave, admin actions)
-- [ ] Status updates
-- [ ] Contact management
-- [ ] Session persistence
-- [ ] Multi-device support
-- [ ] Better error handling and recovery
-- [ ] Performance optimizations
-- [ ] Comprehensive test suite
+[![V Version](https://img.shields.io/badge/V-0.4.11+-blue.svg)](https://vlang.io)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Author](https://img.shields.io/badge/Author-Nathan.dev-orange.svg)](https://github.com/nathan-dev)
 
 ---
 
-**Disclaimer**: This library is not affiliated with WhatsApp Inc. Use at your own risk and ensure compliance with WhatsApp's Terms of Service.
+## 🚀 Fitur Utama
+
+### ✨ **Protokol WhatsApp Web Lengkap**
+- 🔗 WebSocket connection dengan proper headers dan extensions
+- 🔐 Binary node parsing dan encoding sesuai protokol WhatsApp
+- 🛡️ AES-256-CBC encryption/decryption untuk semua komunikasi
+- 🔑 HMAC-SHA256 message authentication
+- 🔄 Curve25519 ECDH key exchange
+- 📊 HKDF key derivation sesuai standar
+
+### 🔐 **Metode Autentikasi**
+- ✅ **QR Code Authentication** - Scan dengan aplikasi WhatsApp mobile
+- ✅ **Pairing Code Authentication** - Input kode di aplikasi mobile  
+- ✅ **Session Restoration** - Auto-login dengan session tersimpan
+- 🔄 Auto-reconnect dengan exponential backoff
+- 💾 Persistent session storage
+
+### 💬 **Manajemen Pesan**
+- 📤 Kirim/terima pesan teks dengan enkripsi penuh
+- 🖼️ Dukungan media (gambar, video, audio, dokumen)
+- 📝 Message parsing dan decryption real-time
+- 🔔 Event-driven message handling
+- 💾 Local message storage dan caching
+- ✅ Read receipts dan delivery status
+
+### 🛠️ **Utilitas & Tools**
+- 🎨 Built-in ASCII QR code generator
+- 📊 Comprehensive logging dan debugging
+- 🔄 Automatic session management
+- 🌐 Multi-platform support (Linux, Windows, macOS)
+- 📚 Type-safe API dengan V's strong typing
+
+---
+
+## 📦 Instalasi
+
+### Prasyarat
+- V Programming Language v0.4.11 atau lebih baru
+- Internet connection untuk koneksi WhatsApp Web
+
+### Clone Repository
+```bash
+git clone https://github.com/nathan-dev/whatsapp-v-lang.git
+cd whatsapp-v-lang
+```
+
+### Build Library
+```bash
+v build .
+```
+
+---
+
+## 🎯 Quick Start
+
+### 1. Basic Usage dengan QR Code
+
+```v
+import whatsapp
+
+fn main() {
+    // Konfigurasi session
+    config := whatsapp.SessionConfig{
+        auth_method: .qr_code
+        browser_name: 'My V Bot'
+        browser_version: '1.0.0'
+        print_qr: true
+        session_path: './session_data'
+    }
+    
+    // Buat session baru
+    mut session := whatsapp.new_session(config) or {
+        panic('Failed to create session: ${err}')
+    }
+    
+    // Start session
+    session.start() or {
+        panic('Failed to start session: ${err}')
+    }
+    
+    // Wait sampai ready
+    for session.get_state() != .ready {
+        time.sleep(1 * time.second)
+    }
+    
+    println('✅ WhatsApp connected!')
+    
+    // Kirim pesan
+    options := whatsapp.SendMessageOptions{}
+    session.send_message('6281234567890@s.whatsapp.net', 'Hello from V!', options) or {
+        println('Failed to send message: ${err}')
+    }
+}
+```
+
+### 2. Menggunakan Pairing Code
+
+```v
+import whatsapp
+
+fn main() {
+    config := whatsapp.SessionConfig{
+        auth_method: .pairing_code
+        phone_number: '+6281234567890' // Nomor HP Anda
+        browser_name: 'V WhatsApp Bot'
+        session_path: './session_data'
+    }
+    
+    mut session := whatsapp.new_session(config) or {
+        panic('Failed to create session: ${err}')
+    }
+    
+    session.start() or {
+        panic('Failed to start: ${err}')
+    }
+    
+    // Pairing code akan ditampilkan di console
+    // Masukkan code tersebut di WhatsApp mobile app
+}
+```
+
+### 3. Event Handling
+
+```v
+import whatsapp
+
+fn main() {
+    // Setup event callbacks
+    mut callbacks := whatsapp.EventCallbacks{
+        on_message: fn (message whatsapp.Message) {
+            println('📩 New message from ${message.remote_jid}: ${message.text}')
+        }
+        
+        on_connection_update: fn (state whatsapp.ConnectionState, data map[string]string) {
+            println('🔄 Connection state: ${state}')
+        }
+        
+        on_qr_code: fn (qr_data string) {
+            println('📱 Scan this QR code with your phone')
+            // QR akan otomatis ditampilkan jika print_qr: true
+        }
+    }
+    
+    config := whatsapp.SessionConfig{
+        auth_method: .qr_code
+        session_path: './session_data'
+    }
+    
+    mut session := whatsapp.new_session(config) or { panic(err) }
+    session.start() or { panic(err) }
+    
+    // Keep alive
+    for {
+        time.sleep(1 * time.second)
+    }
+}
+```
+
+---
+
+## 📚 API Documentation
+
+### 🏗️ **Core Types**
+
+#### SessionConfig
+```v
+struct SessionConfig {
+    auth_method     AuthMethod = .qr_code    // Metode autentikasi
+    browser_name    string = 'V-WhatsApp'    // Nama browser
+    browser_version string = '1.0.0'         // Versi browser
+    phone_number    string                   // Nomor HP (untuk pairing code)
+    print_qr        bool = true              // Print QR code ke console
+    session_path    string = './session'     // Path penyimpanan session
+    log_level       string = 'info'          // Level logging
+}
+```
+
+#### Message
+```v
+struct Message {
+    id                string              // ID pesan
+    remote_jid        string              // JID pengirim/penerima
+    from_me           bool                // Apakah dari kita
+    participant       string              // Participant (untuk grup)
+    timestamp         u64                 // Timestamp pesan
+    status            MessageStatus       // Status pesan
+    message_type      MessageType         // Tipe pesan
+    text              string              // Isi pesan teks
+    quoted_message    ?&Message           // Pesan yang di-quote
+    media_info        ?MediaInfo          // Info media (jika ada)
+    // ... dan banyak field lainnya
+}
+```
+
+### 🔧 **Main Methods**
+
+#### Session Management
+```v
+// Buat session baru
+fn new_session(config SessionConfig) !&Session
+
+// Start session dan autentikasi
+fn (mut session Session) start() !
+
+// Get status koneksi
+fn (session &Session) get_state() ConnectionState
+
+// Logout dan cleanup
+fn (mut session Session) logout() !
+```
+
+#### Messaging
+```v
+// Kirim pesan teks
+fn (mut session Session) send_message(jid string, text string, options SendMessageOptions) !string
+
+// Get daftar chat
+fn (session &Session) get_chats() map[string]Chat
+
+// Get pesan dari chat tertentu
+fn (session &Session) get_messages(jid string) []Message
+```
+
+---
+
+## 🎨 Examples
+
+### Bot Sederhana
+```v
+import whatsapp
+import time
+
+fn main() {
+    config := whatsapp.SessionConfig{
+        auth_method: .qr_code
+        browser_name: 'V Echo Bot'
+        session_path: './bot_session'
+    }
+    
+    mut session := whatsapp.new_session(config) or { panic(err) }
+    
+    // Setup message handler
+    session.event_callbacks.on_message = fn [mut session] (message whatsapp.Message) {
+        if !message.from_me && message.text.starts_with('!echo ') {
+            response := message.text[6..] // Remove "!echo "
+            options := whatsapp.SendMessageOptions{
+                quoted_message_id: message.id
+            }
+            
+            session.send_message(message.remote_jid, 'Echo: ${response}', options) or {
+                println('Failed to send echo: ${err}')
+            }
+        }
+    }
+    
+    session.start() or { panic(err) }
+    
+    // Keep bot running
+    for {
+        time.sleep(1 * time.second)
+    }
+}
+```
+
+### Group Management
+```v
+import whatsapp
+
+fn main() {
+    // ... setup session ...
+    
+    // Get grup info
+    chats := session.get_chats()
+    for jid, chat in chats {
+        if chat.chat_type == .group {
+            println('📱 Group: ${chat.name}')
+            println('   JID: ${jid}')
+            println('   Members: ${chat.group_metadata?.participants.len or { 0 }}')
+        }
+    }
+}
+```
+
+---
+
+## 🔧 Advanced Configuration
+
+### Custom Event Callbacks
+```v
+mut callbacks := whatsapp.EventCallbacks{
+    on_qr_code: fn (qr_data string) {
+        // Custom QR handling
+        save_qr_to_file(qr_data)
+    }
+    
+    on_pairing_code: fn (code string) {
+        // Custom pairing code handling
+        send_code_via_email(code)
+    }
+    
+    on_message: fn (message whatsapp.Message) {
+        // Custom message processing
+        process_incoming_message(message)
+    }
+    
+    on_message_receipt: fn (receipt whatsapp.ReceiptInfo) {
+        // Handle read receipts
+        println('Message ${receipt.message_id} was ${receipt.receipt_type}')
+    }
+    
+    on_presence_update: fn (presence whatsapp.PresenceInfo) {
+        // Handle presence updates
+        println('${presence.jid} is ${presence.presence_type}')
+    }
+    
+    on_error: fn (error string, data map[string]string) {
+        // Custom error handling
+        log_error(error, data)
+    }
+}
+```
+
+### Session Persistence
+```v
+// Session akan otomatis disimpan ke file
+// dan di-restore saat startup berikutnya
+
+config := whatsapp.SessionConfig{
+    session_path: './my_bot_session'  // Folder penyimpanan
+    // ... config lainnya
+}
+
+// Session file akan dibuat di:
+// ./my_bot_session/session.json
+```
+
+---
+
+## 🛡️ Security & Best Practices
+
+### 🔐 **Keamanan**
+- ✅ Semua komunikasi dienkripsi end-to-end
+- ✅ Private keys disimpan aman di local storage
+- ✅ Session tokens di-encrypt sebelum disimpan
+- ✅ HMAC validation untuk semua pesan masuk
+- ⚠️ Jangan share session files dengan orang lain
+
+### 📋 **Best Practices**
+- 🔄 Selalu handle error dengan proper error handling
+- 💾 Backup session files secara berkala
+- 🚫 Jangan spam pesan (WhatsApp punya rate limiting)
+- 📱 Test dengan nomor sendiri dulu sebelum production
+- 🔍 Enable logging untuk debugging
+
+### ⚡ **Performance Tips**
+- 🎯 Gunakan event callbacks untuk handling real-time
+- 💾 Implement message caching untuk aplikasi besar
+- 🔄 Batch multiple operations jika memungkinkan
+- 📊 Monitor memory usage untuk long-running bots
+
+---
+
+## 🐛 Troubleshooting
+
+### Masalah Umum
+
+#### 1. QR Code tidak muncul
+```bash
+# Pastikan terminal mendukung Unicode
+export LANG=en_US.UTF-8
+
+# Atau disable QR printing
+config.print_qr = false
+```
+
+#### 2. Session tidak tersimpan
+```bash
+# Pastikan folder session bisa ditulis
+mkdir -p ./session_data
+chmod 755 ./session_data
+```
+
+#### 3. Koneksi sering terputus
+```v
+// Increase timeout values
+config := whatsapp.SessionConfig{
+    // ... other config
+    log_level: 'debug'  // Enable debug logging
+}
+```
+
+#### 4. Error saat compile
+```bash
+# Update V ke versi terbaru
+v self-update
+
+# Clean build cache
+v clean-cache
+```
+
+---
+
+## 🤝 Contributing
+
+Kontribusi sangat diterima! Berikut cara berkontribusi:
+
+### 1. Fork Repository
+```bash
+git fork https://github.com/nathan-dev/whatsapp-v-lang.git
+```
+
+### 2. Create Feature Branch
+```bash
+git checkout -b feature/amazing-feature
+```
+
+### 3. Commit Changes
+```bash
+git commit -m 'Add amazing feature'
+```
+
+### 4. Push & Create PR
+```bash
+git push origin feature/amazing-feature
+# Buat Pull Request di GitHub
+```
+
+### 📋 **Development Guidelines**
+- 🧪 Tambahkan tests untuk fitur baru
+- 📚 Update dokumentasi jika diperlukan
+- 🎨 Follow V coding conventions
+- 🔍 Pastikan tidak ada breaking changes
+
+---
+
+## 📄 License
+
+Project ini dilisensikan dengan **MIT License** - lihat file [LICENSE](LICENSE) untuk detail.
+
+```
+MIT License
+
+Copyright (c) 2025 Nathan.dev
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software...
+```
+
+---
+
+## 👨‍💻 Author
+
+**Nathan.dev**
+- 🌐 GitHub: [@nathan-dev](https://github.com/nathan-dev)
+- 📧 Email: nathan@example.com
+- 🐦 Twitter: [@nathandev](https://twitter.com/nathandev)
+
+---
+
+## 🙏 Acknowledgments
+
+- 🎯 **WhiskeySocket Baileys** - Inspirasi utama untuk implementasi protokol
+- 🚀 **V Language Team** - Bahasa pemrograman yang amazing
+- 🌍 **WhatsApp** - Platform messaging terbaik
+- 👥 **Open Source Community** - Support dan kontribusi
+
+---
+
+## ⭐ Star History
+
+Jika project ini berguna, jangan lupa kasih ⭐ ya!
+
+[![Star History Chart](https://api.star-history.com/svg?repos=nathan-dev/whatsapp-v-lang&type=Date)](https://star-history.com/#nathan-dev/whatsapp-v-lang&Date)
+
+---
+
+## 📊 Stats
+
+![GitHub stars](https://img.shields.io/github/stars/nathan-dev/whatsapp-v-lang?style=social)
+![GitHub forks](https://img.shields.io/github/forks/nathan-dev/whatsapp-v-lang?style=social)
+![GitHub watchers](https://img.shields.io/github/watchers/nathan-dev/whatsapp-v-lang?style=social)
+
+---
+
+<div align="center">
+
+**🚀 Built with ❤️ using V Programming Language**
+
+[⬆ Back to Top](#-whatsapp-v-lang-library)
+
+</div>
